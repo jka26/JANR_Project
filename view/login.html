@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../assets/login.css">
+  <title>Log In | Rush!</title>
+  <link rel="icon" type="image/x-con" href="../assets/favicon_rush.ico">
+</head>
+<body style="background-image: url('../assets/signuploginbackground.jpeg')">
+  
+  <div class="loginform">
+    <h1> LOG IN </h1>
+    <form id="login-form" method="post" action="../actions/login.php">
+      <label for ="email"> Email Address</label>
+      <input name="email" id="email" type="email" placeholder="Email" required>
+      <br>
+      <label for="password">Password</label>
+      <input name="password" id="password" type="password" placeholder="Password" required>
+      <br>
+      <button type="submit">Login</button>
+      <p>Don't have an account? <a href="signup.html">Register here</a></p>
+      <p class="error" id="errorMessage" style="color: red;"></p>
+  </form>
+  <div id="errorMessages" style="color: red;"></div>
+  </div>
+  
+  <script>
+    
+    document.getElementById("login-form").addEventListener("submit", function(event) {
+      event.preventDefault(); // Prevent form submission
+            
+      //Clear previous error messages
+      // document.getElementById("emailError").style.display = 'none';
+      // document.getElementById("passwordError").style.display = 'none';
+      const errorMsg = document.getElementById("errorMessage");
+      errorMsg.innerHTML = '';
+
+      let hasError = false;
+
+      // Validate email format
+      const email = document.getElementById("email").value;
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(email)) {
+        errorMsg.innerHTML += "Invalid email.<br>";
+        hasError = true;
+        // document.getElementById("emailError").style.display = 'block';
+        // return;
+      }
+
+      // Validate password
+      const password = document.getElementById("password").value;
+      
+
+      if (password.length < 8) {
+        errorMsg.innerHTML += "Password must be at least 8 characters long.<br>";
+        // document.getElementById("passwordError").innerText = "Password must be at least 8 characters long.";
+        // document.getElementById("passwordError").style.display = 'block';
+        hasError = true;
+      }
+      if (!/[A-Z]/.test(password)) {
+        errorMsg.innerHTML += "\nPassword must contain at least one uppercase letter.";
+        // document.getElementById("passwordError").innerText += "\nPassword must contain at least one uppercase letter.";
+        // document.getElementById("passwordError").style.display = 'block';
+        hasError = true;
+      }
+      if ((password.match(/\d/g) || []).length < 1) {
+        errorMsg.innerHTML += "\nPassword must include at least one digit.";
+        // document.getElementById("passwordError").innerText += "\nPassword must include at least three digits.";
+        // document.getElementById("passwordError").style.display = 'block';
+        hasError = true;
+      }
+      if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+        errorMsg.innerHTML += "\nPassword must contain at least one special character.";
+        // document.getElementById("passwordError").innerText += "\nPassword must contain at least one special character.";
+        // document.getElementById("passwordError").style.display = 'block';
+        hasError = true;
+      }
+
+      // If there are no errors, proceed with form submission (here, we just log to console)
+      if (!hasError) {
+        console.log("Form submitted successfully!");
+        document.getElementById("login-form").submit();
+      }
+    });
+  </script>
+  
+</body>
+</html>

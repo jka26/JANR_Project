@@ -1,0 +1,151 @@
+html, body {
+    margin-top: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    padding-bottom: 0 30px 0 30px;
+    min-height: 1200px;
+    font-family: Arial, sans-serif;
+    background-size: cover;
+    background-attachment: scroll;
+}
+
+h2 {
+  text-align: center;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  color:#db1478;
+}
+
+/*Add a black background color to the top navigation*/
+.topnav {
+  background-color: #000000;
+  overflow: hidden;
+}
+
+/*Style the links inside the navigation bar*/
+.topnav a {
+  float: right;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 18px 20px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/*Change the color of links on hover*/
+.topnav a:hover {
+  background-color: #f266ac;
+  color: black;
+}
+
+/*Add a color to the active/current link*/
+.topnav a.active {
+  background-color: #db1478;
+  color: white;
+}
+
+section {
+  display: flex;
+  align-items: flex-start; /* Align columns to the top */
+  justify-content: space-between; /* Removes space around the columns */
+  gap: 20px; /* Adds controlled spacing between columns */
+  width: 100%; /* Ensure the section spans the entire width */
+}
+
+.form-container {
+  flex-grow: 1;
+  padding: 30px;
+  /*background-color: #ffe8b8;*/
+}
+
+.lsidecol, .rsidecol {
+  width: 75%;
+  flex: 1; /* Dynamically take equal space */
+  padding: 20px; /* Add consistent padding */
+  box-sizing: border-box; /* Include padding in width calculations */
+  border-radius: 10px;
+  background-image: url("hearts_background.jpg");
+  background-color: #f7dce5; /* Background for visibility */
+}
+
+.lsidecol {
+  margin-right: 10px; /* Optional: Small spacing between columns */
+}
+
+.rsidecol {
+  margin-left: 10px; /* Optional: Small spacing between columns */
+}
+
+.info-form {
+  padding: 20px; /* Increase padding inside the inner forms */
+  background-color: #ffb9c5;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Slightly stronger shadow for emphasis */
+  font-weight: bold;
+  /*background-image: url("hearts_background.jpg");*/
+}
+
+input[type="file"] {
+  display: none;
+}
+
+label {
+  font-size:small;
+}
+
+input {
+  width: 90%; /* Make the input fields wider */
+  margin-bottom: 15px; /* Add space between input fields */
+  padding: 10px; /* Increase padding for better usability */
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.custom-file-upload {
+  display: inline-block;
+  padding: 5px 10px;
+  background-color:#000000;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.custom-file-upload:hover {
+  background-color: #45a049;
+}
+
+.image-preview-container {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%; /* Circular shape */
+  background-color: #f0f0f0; /* Light grey background */
+  justify-content: center;
+  display: inline-block;
+  align-items: center;
+  overflow: hidden; /* Ensures image doesn't exceed circle */
+  border: 2px solid #ddd; /* Optional: Add border */
+  margin-top: 10px;
+}
+
+.image-preview-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image covers the container */
+  border-radius: 50%; /* Ensures the image stays round */
+  display: none; /* Hidden until file is selected */
+} 
+
+
+
+
+
+
+
+
+
+
+

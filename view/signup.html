@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../assets/signup.css">
+  <title>Sign Up | Rush!</title>
+  <link rel="icon" type="image/x-con" href="../assets/favicon_rush.ico">
+</head>
+<body style="background-image: url('../assets/signuploginbackground.jpeg')">
+  <div class="signupform">
+    <h1> SIGN UP </h1>
+    <form id="signup-form" method="post" action="../actions/register.php">
+      <label for="first-name">First Name</label>
+      <input type="text" name="first-name" id="first-name" placeholder="First Name" required>
+      <br>
+      <label for="last-name">Last Name</label>
+      <input type="text" name="last-name" id="last-name" placeholder="Last Name" required>
+      <br>
+      <label for="email">Email Address</label>
+      <input type="email" name="email" id="email" placeholder="Email Address" required>
+      <br>
+      <label for="country">Country</label>
+      <input type="text" name="country" id="country" placeholder="Country" required>
+      <br>
+      <div class="phone-input-container">
+        <label for="phone-number">Phone Number</label>
+        <div class="phone-input-wrapper">
+            <div class="country-code">
+                <select id="country-code">
+                    <option value="+233">+233</option>
+                    <option value="+1">+1</option>
+                    <option value="+44">+44</option>
+                    <option value="+91">+91</option>
+                </select>
+            </div>
+            <input type="tel" name="phone-number" id="phone-number" class="phone-number" placeholder="Enter phone number" required>
+        </div>
+      </div>       
+      <br>
+      <label for="password">Password</label>
+      <input type="password" name="password" id="password" placeholder="Password" required>
+      <br>
+      <label for="confirm-password">Confirm Password</label>
+      <input type="password" name="confirm-password" id="confirm-password" required>
+      <br>
+      <button type="submit">Sign Up</button>
+      <p>Already have an account? <a href="login.html">Log in here</a></p>
+      
+    </form>
+    <div id="errorMessages" style="color: red;"></div>
+    
+  </div>
+
+  <script>
+    document.getElementById('signup-form').addEventListener('submit', function(event) {
+      event.preventDefault(); 
+    
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone-number').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+    
+     // Clear previous error messages
+      const errorMessagesDiv = document.getElementById("errorMessages");
+      errorMessagesDiv.innerHTML = '';
+      
+      let isValid = true; 
+    
+      // Email validation
+      const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+      if (!emailRegex.test(email)) {
+        errorMessagesDiv.innerHTML += "Invalid email format.<br>";
+        isValid = false;
+      } 
+
+      //validate phone number
+      if(phone.length != 9) {
+        errorMessagesDiv.innerHTML += "Phone number should be 9 digits long.<br>";
+        isValid = false;
+      }
+
+      //Password validation
+      if (password.length < 8) {
+        errorMessagesDiv.innerHTML += "Password must be at least 8 characters long.<br>";
+        isValid = false;
+      }
+      if (!/[A-Z]/.test(password)) {
+        errorMessagesDiv.innerHTML += "Password must contain at least one uppercase letter.<br>";
+        isValid = false;
+        }
+      if ((password.match(/\d/g) || []).length < 1) {
+        errorMessagesDiv.innerHTML += "Password must include at least one digit.<br>";
+        isValid = false;
+      }
+      if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+        errorMessagesDiv.innerHTML += "Password must contain at least one special character.<br>";
+        isValid = false;
+      }
+
+      //Confirm if the entered password is a match
+      if (password !== confirmPassword) {
+        errorMessagesDiv.innerHTML += "Passwords do not match.<br>";
+        isValid = false;
+      }
+    
+      if (isValid) {
+        console.log("Form submitted successfully!");
+        document.getElementById("signupForm").submit();
+      }
+    });
+  </script>
+
+</body>
+</html>
