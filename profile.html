@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Profile | Rush!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/profile.css">
+    <link rel="icon" type="image/x-con" href="../assets/favicon_rush.ico">
+</head>
+<body>
+    <div class="topnav">
+        <img src="../assets/websitelogo-removebg-preview.png" alt="Rush!" width: 100%; height="70px">
+        <a href="signup.html">Sign Up</a>
+        <a href="login.html">Log In</a>
+        <a class="active" href="landing.html">Home</a>
+        <a href="#news">News</a>
+        <a href="#contact">Contact</a>
+        <a href="#about">About</a>
+    </div>
+    <h2>Create Your Profile</h2>
+    
+    <form id="profileForm" onsubmit="handleSubmit(event)" method="post" action="../actions/profile.php">
+        <section class="form-container">
+            <!-- Left Column -->
+            <div class="lsidecol">
+                <fieldset class="info-form">
+                    <legend>Personal Information</legend>
+                    <div class="image-preview-container">
+                        <img id="preview" src="#" alt="Image Preview">
+                    </div><br>
+                    <label for="fileUpload" class="custom-file-upload">
+                        Choose profile photo
+                    </label>
+                    <input id="fileUpload" name="fileUpload" type="file" accept="image/*" onchange="previewImage(event)"><br><br>
+                    <label for="fname">First Name:</label>
+                    <input type="text" id="fname" name="fname" required><br><br>
+                    <label for="lname">Last Name:</label>
+                    <input type="text" id="lname" name="lname" required><br><br>
+                    <label for="age">Age:</label>
+                    <input type="number" id="age" name="age" required><br><br>
+                    <label for="location">Location:</label>
+                    <input type="text" id="location" name="location" required><br><br>
+                    <label for="dob">Birth Date:</label>
+                    <input type="date" id="dob" name="dob" required><br><br>
+                    <label for="gender">Gender:</label>
+                    <input type="text" id="gender" name="gender">
+                </fieldset>
+            </div>
+            <!-- Right Column -->
+            <div class="rsidecol">
+                <fieldset class="info-form">
+                    <legend>Additional Information</legend>
+                    <label for="bio">Bio:</label>
+                    <textarea id="bio" name="bio" placeholder="Tell us about yourself..."></textarea><br><br>
+                    <label for="hobbies">Hobbies / Interests:</label>
+                    <textarea id="hobbies" name="hobbies" placeholder="What do you like to do?"></textarea><br><br>
+                    <label for="personality">Personality:</label>
+                    <textarea id="personality" name="personality" placeholder="Describe your personality"></textarea>
+                </fieldset>
+            </div>
+        </section>
+        <div class="submit-container" style="text-align: center; margin: 20px 0;">
+            <a href="matchmaking.php">
+                <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Create Profile</button>
+            </a>
+            
+        </div>
+    </form>
+
+    <script>
+        function previewImage(event) {
+            const preview = document.getElementById('preview');
+            preview.src = URL.createObjectURL(event.target.files[0]);
+            preview.style.display = 'block'; // Show the image once selected
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            console.log('Form submitted!');
+           
+            document.getElementById("profileForm").submit();
+            alert('Profile created successfully!');
+        }
+    </script>
+</body> 
+</html>

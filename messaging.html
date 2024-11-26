@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messaging | Rush!</title>
+    <link rel="icon" href="../assets/favicon_rush.ico" type="ico">
+    <link rel="stylesheet" href="../assets/messaging.css">
+</head>
+<body>
+
+    <header class="header">
+        <h1>Discover and Experience Love</h1>
+    </header>
+
+    <div class="chat-container">
+        <div class="users-list">
+            <?php
+                include "config.php";
+                include "fetch_users.php";
+            ?>
+        </div>
+        <div class="chat-box">
+            <p>Select a user to start a conversation</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userElements = document.querySelectorAll(".user");
+
+            userElements.forEach(user => {
+                user.addEventListener("click", () => {
+                    const userId = user.dataset.id;
+                    loadChat(userId);
+                });
+            });
+        });
+
+        function loadChat(userId) {
+            fetch(`load_chat.php?user_id=${userId}`)
+            .then(response => response.text())
+            .then(data => {
+                document.querySelector(".chat-box").innerHTML = data;
+            })
+            .catch(error => console.error("Error loading chat:", error));
+        }
+    </script>
+
+</body>
+</html>
