@@ -35,71 +35,72 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     // Handle file upload
-$uploadDir = "uploads/";
-$profileImagePath = null;
+// $uploadDir = "uploads/";
+// $profileImagePath = null;
 
-if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
-    // Ensure upload directory exists
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
-    }
+// if (isset($_FILES['fileUpload']) && $_FILES['fileUpload']['error'] === UPLOAD_ERR_OK) {
+//     // Ensure upload directory exists
+//     if (!is_dir($uploadDir)) {
+//         mkdir($uploadDir, 0755, true);
+//     }
 
-    // Get file details
-    $tmpName = $_FILES['profile_image']['tmp_name'];
-    $originalName = basename($_FILES['profile_image']['name']);
-    $fileSize = $_FILES['profile_image']['size'];
+//     // Get file details
+//     $tmpName = $_FILES['fileUpload']['tmp_name'];
+//     $originalName = basename($_FILES['fileUpload']['name']);
+//     $fileSize = $_FILES['fileUpload']['size'];
 
-    // Get actual file type using mime type
-    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mimeType = finfo_file($finfo, $tmpName);
-    finfo_close($finfo);
+//     // Get actual file type using mime type
+//     $finfo = finfo_open(FILEINFO_MIME_TYPE);
+//     $mimeType = finfo_file($finfo, $tmpName);
+//     finfo_close($finfo);
 
-    // Allowed mime types
-    $allowedMimeTypes = [
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
-        'image/gif' => 'gif'
-    ];
+//     // Allowed mime types
+//     $allowedMimeTypes = [
+//         'image/jpeg' => 'jpg',
+//         'image/png' => 'png',
+//         'image/gif' => 'gif'
+//     ];
 
-    // Validate file type and size
-    if (!array_key_exists($mimeType, $allowedMimeTypes) || $fileSize > 5000000) {
-        echo json_encode(['success' => false, 'message' => 'Invalid file type or file size exceeds 5MB.']);
-        exit;
-    }
+//     // Validate file type and size
+//     if (!array_key_exists($mimeType, $allowedMimeTypes) || $fileSize > 5000000) {
+//         echo json_encode(['success' => false, 'message' => 'Invalid file type or file size exceeds 5MB.']);
+//         exit;
+//     }
 
-    // Generate unique filename
-    $fileName = uniqid() . '_' . $originalName;
-    $profileImagePath = $uploadDir . $fileName;
+//     // Generate unique filename
+//     $fileName = uniqid() . '_' . $originalName;
+//     $profileImagePath = $uploadDir . $fileName;
 
-    // Move uploaded file with additional security checks
-    if (is_uploaded_file($tmpName) && move_uploaded_file($tmpName, $profileImagePath)) {
-        // File upload successful
-        echo json_encode(['success' => true, 'message' => 'File uploaded successfully.', 'path' => $profileImagePath]);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'File upload failed.']);
-        exit;
-    }
-} else {
-    // Handle upload errors
-    $errorMessages = [
-        UPLOAD_ERR_INI_SIZE => 'File exceeds upload_max_filesize',
-        UPLOAD_ERR_FORM_SIZE => 'File exceeds MAX_FILE_SIZE',
-        UPLOAD_ERR_PARTIAL => 'File was only partially uploaded',
-        UPLOAD_ERR_NO_FILE => 'No file was uploaded',
-        UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
-        UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
-        UPLOAD_ERR_EXTENSION => 'File upload stopped by extension'
-    ];
+//     // Move uploaded file with additional security checks
+//     if (is_uploaded_file($tmpName) && move_uploaded_file($tmpName, $profileImagePath)) {
+//         // File upload successful
+//         echo json_encode(['success' => true, 'message' => 'File uploaded successfully.', 'path' => $profileImagePath]);
+//     } else {
+//         echo json_encode(['success' => false, 'message' => 'File upload failed.']);
+//         exit;
+//     }
+// } else {
+//     // Handle upload errors
+//     $errorMessages = [
+//         UPLOAD_ERR_INI_SIZE => 'File exceeds upload_max_filesize',
+//         UPLOAD_ERR_FORM_SIZE => 'File exceeds MAX_FILE_SIZE',
+//         UPLOAD_ERR_PARTIAL => 'File was only partially uploaded',
+//         UPLOAD_ERR_NO_FILE => 'No file was uploaded',
+//         UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
+//         UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
+//         UPLOAD_ERR_EXTENSION => 'File upload stopped by extension'
+//     ];
 
-    $errorCode = $_FILES['profile_image']['error'] ?? UPLOAD_ERR_NO_FILE;
-    echo json_encode([
-        'success' => false, 
-        'message' => $errorMessages[$errorCode] ?? 'Unknown upload error'
-    ]);
-    exit;
-}
+//     $errorCode = $_FILES['fileUpload']['error'] ?? UPLOAD_ERR_NO_FILE;
+//     echo json_encode([
+//         'success' => false, 
+//         'message' => $errorMessages[$errorCode] ?? 'Unknown upload error'
+//     ]);
+//     exit;
+// }
 
     $user_id = $_SESSION['user_id'];
+    echo $user_id;
 
     // Check if the user already has a profile
     $checkUserSql = "SELECT user_id FROM profiles WHERE user_id = ?";

@@ -1,8 +1,8 @@
 <?php
     $servername = "localhost";
-$username = "jemima.arhin";
-$password = "SjQeLm1#";
-$dbname = "webtech_fall2024_jemima_arhin";
+$username = "root";
+$password = "";
+$dbname = "rush_db";
     // Database connection (adjust with your credentials)
     $conn = new mysqli($servername, $username, $password, $dbname);
     
