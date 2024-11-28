@@ -56,29 +56,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Hash the password
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-        // Set default role as 2 (regular admin) and add timestamps
-        // $role = 2;
-        // $created_at = date('Y-m-d H:i:s');
-        // $updated_at = $created_at;
-
         // Insert new user into database using a prepared statement
         $stmt = $conn->prepare("INSERT INTO profiles (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("ssssi", $first_name, $last_name, $email, $hashed_password, $role);
 
         if ($stmt->execute()) {
-            //echo "Registration successful!";
-            header("Location: ../view/login.html");
+            echo json_encode(['success' => true, 'message' => 'Registration successful!']);
+            exit();
         } else {
-            echo "Error: " . $stmt->error;
+            echo json_encode(['success' => false, 'errors' => ["Error: " . $stmt->error]]);
+            exit();
         }
         $stmt->close();
     } else {
-        // Display errors
-        foreach ($errors as $error) {
-            echo "<p style='color: red;'>$error</p>";
-        }
+        // Return errors as JSON
+        echo json_encode(['success' => false, 'errors' => $errors]);
+        exit();
     }
 
     $conn->close();
 }
-?>

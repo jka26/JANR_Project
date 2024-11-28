@@ -54,6 +54,40 @@
   </div>
 
   <script>
+
+    document.getElementById("signup-form").addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const formData = new FormData(this); // Get form data
+
+        // Send the form data using fetch
+        fetch("../actions/signup.php", {
+            method: "POST",
+            body: formData,
+        })
+        .then(response => response.json()) // Parse JSON response
+        .then(data => {
+            if (data.success) {
+                // On success, redirect or display a success message
+                console.log(data.message);
+                alert("Registration successful! Redirecting to login...");
+                window.location.href = "../view/login.html";
+            } else {
+                // Display errors in the console and alert the user
+                console.error(data.errors);
+                alert("Errors:\n" + data.errors.join("\n"));
+            }
+        })
+        .catch(error => {
+            console.error("An error occurred:", error);
+            alert("An unexpected error occurred. Please try again.");
+        });
+    });
+
+
+
+
+
     document.getElementById('signup-form').addEventListener('submit', function(event) {
       event.preventDefault(); 
     

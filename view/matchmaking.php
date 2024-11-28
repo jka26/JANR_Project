@@ -9,7 +9,7 @@
 </head>
 <body>
   <!-- Navigation Bar -->
-  
+  <canvas id="canvas"></canvas>
   <nav>
     <ul>
       <li><a href="reviewpage.html">Send Review</a></li>
@@ -39,10 +39,9 @@
       include "../db/config.php";
 
 // Query to fetch users and their interests
-$sql = "SELECT p.user_id, p.first_name, p.last_name, p.profile_image, GROUP_CONCAT(i.interest_desc) AS interests
+$sql = "SELECT p.user_id, p.first_name, p.last_name, p.profile_image, p.hobbies
         FROM profiles p
         JOIN user_interests ui ON p.user_id = ui.user_id
-        JOIN interests i ON ui.interest_id = i.interest_id
         GROUP BY p.user_id";
 
 // Execute query
@@ -55,7 +54,7 @@ if ($result->num_rows > 0) {
         echo '<div class="profile-card">';
         echo '<img src="uploads/' . $row['profile_image'] . '" alt="Profile Picture">';
         echo '<h3>' . $row['first_name'] . ' ' . $row['last_name'] . '</h3>';
-        echo '<p>Interests: ' . $row['interests'] . '</p>';
+        echo '<p>Interests: ' . $row['hobbies'] . '</p>';
         echo '<form action="../actions/compatible.php" method="POST">';
         echo '<input type="hidden" name="selected_user_id" value="' . $row['user_id'] . '">';
         echo '<button type="submit" name="connect_button">Connect</button>';

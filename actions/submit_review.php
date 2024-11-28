@@ -18,8 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION['user_id'])) {
     }
 
     // Prepared statement to avoid SQL injection
-    $stmt = $conn->prepare("INSERT INTO reviews (user_id, review_content, rating) VALUES (?, ?, ?)");
-    $stmt->bind_param("isi", $user_id, $review_text, $rating);
+    $stmt = $conn->prepare("INSERT INTO reviews (review_content, user_id, rating) VALUES (?, ?, ?)");
+    $stmt->bind_param("sii", $review_text,$user_id, $rating);
 
     // Execute and check for errors
     if ($stmt->execute()) {

@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($role == 1) { // Super Admin role
                     header("Location: ../view/dashboard.php");
                 } else {
-                    header("Location: ../view/profile.php");
+                    header("Location: ../view/profile.html");
                 }
                 exit();
             } else {
