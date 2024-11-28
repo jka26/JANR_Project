@@ -1,31 +1,38 @@
 <?php
-include "../db/config.php"; // Ensure the database connection file is included
+include "../db/config.php";
+header("Content-Type: application/json");
 
-// Get user ID from URL
-$userId = $_GET['user_id'] ?? null;
+if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
+    $data = json_decode(file_get_contents("php://input"), true);
 
-if ($userId) {
-    // Prepare the SQL query to delete the user
-    $sql = "DELETE FROM profiles WHERE user_id = ?";
-    $stmt = $conn->prepare($sql);
+    if (isset($data['user_id'])) {
+        $user_id = $data['user_id'];
 
-    if ($stmt) {
-        $stmt->bind_param("i", $userId);
+        $sql = "DELETE FROM profiles WHERE user_id = ?";
+        $stmt = $conn->prepare($sql);
 
-        // Execute the query and handle the result
-        if ($stmt->execute()) {
-            // Redirect to user management page with a success message
-            header("Location: usermanagement.php?message=User deleted successfully");
-            exit;
+        if ($stmt) {
+            $stmt->bind_param("i", $user_id);
+
+            if ($stmt->execute()) {
+                echo json_encode(["message" => "User deleted successfully"]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["message" => "Error deleting user: " . $stmt->error]);
+            }
+
+            $stmt->close();
         } else {
-            echo "Error deleting user: " . $stmt->error;
+            http_response_code(500);
+            echo json_encode(["message" => "Failed to prepare the SQL statement."]);
         }
-        $stmt->close();
     } else {
-        echo "Failed to prepare the SQL statement.";
+        http_response_code(400);
+        echo json_encode(["message" => "Invalid user ID."]);
     }
 } else {
-    echo "Invalid user ID.";
+    http_response_code(405); // Method Not Allowed
+    echo json_encode(["message" => "Invalid request method."]);
 }
 
 $conn->close();

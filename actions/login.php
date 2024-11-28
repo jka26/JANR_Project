@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-include "config.php";
+include "../db/config.php";
 
 // Handle POST request
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -20,14 +20,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // If validation passed
     if (empty($errors)) {
         // Verify user credentials
-        $stmt = $conn->prepare("SELECT user_id, first_name, last_name, email, password FROM users WHERE email = ?");
+        $stmt = $conn->prepare("SELECT user_id, first_name, last_name, email, password, role FROM profiles WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->store_result();
 
         // Check if user exists
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($user_id, $first_name, $last_name, $email, $hashed_password);
+            $stmt->bind_result($user_id, $first_name, $last_name, $email, $hashed_password, $role);
             $stmt->fetch();
 
             // Verify password
@@ -36,19 +36,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['user_id'] = $user_id;
                 $_SESSION['first_name'] = $first_name;
                 $_SESSION['last_name'] = $last_name;
-                //$_SESSION['role'] = $role;
+                $_SESSION['role'] = $role; // Store role in session
 
                 // Redirect based on role
-                // if ($role == 1) { // Super Admin role
-                //     header("Location: dashboard.php");
-                //     exit();
-                // } elseif ($role == 2) { // Regular Admin role
-                //     header("Location: dashboard.php");
-                //     exit();
-                // } else {
-                //     header("Location: dashboard.php");
-                // }
-                // exit;
+                if ($role == 1) { // Super Admin role
+                    header("Location: ../view/dashboard.php");
+                } else {
+                    header("Location: ../view/profile.php");
+                }
+                exit();
             } else {
                 $errors[] = "Incorrect password.";
             }

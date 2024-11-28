@@ -20,6 +20,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $personalBio = isset($_POST['bio']) ? mysqli_real_escape_string($conn, $_POST['bio']) : null;
     $hobbies = isset($_POST['hobbies']) ? mysqli_real_escape_string($conn, $_POST['hobbies']) : null;
     $personality = isset($_POST['personality']) ? mysqli_real_escape_string($conn, $_POST['personality']) : null;
+    $preferred_gender = isset($_POST['preferred_gender']) ? mysqli_real_escape_string($conn, $_POST['preferred_gender']) : null;
+    $min_age = isset($_POST['min_age']) ? mysqli_real_escape_string($conn, $_POST['min_age']) : null;
+    $max_age= isset($_POST['max_age']) ? mysqli_real_escape_string($conn, $_POST['max_age']) : null;
 
     // Check for missing required fields
     if (!$firstName || !$lastName) {
@@ -62,28 +65,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $user_id = $_SESSION['user_id'];
+
+    // Check if the user already has a profile
     $checkUserSql = "SELECT user_id FROM profiles WHERE user_id = ?";
     $checkStmt = $conn->prepare($checkUserSql);
-    $checkStmt->bind_param("i", $userId);
+    $checkStmt->bind_param("i", $user_id);
     $checkStmt->execute();
     $checkResult = $checkStmt->get_result();
 
     if ($checkResult->num_rows > 0) {
-        // User already has a profile, return an error or update logic
-        echo json_encode(['success' => false, 'message' => 'Profile already exists for this user.']);
-        exit;
-    } else {
-        // Save user data to the database
-        $sql = "INSERT INTO profiles (user_id, first_name, last_name, age, location, birth_date, gender, bio, hobbies, personality, profile_image)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // User already has a profile, update it
+        $sql = "UPDATE profiles 
+                    SET first_name = ?, 
+                        last_name = ?, 
+                        age = ?, 
+                        location = ?, 
+                        birth_date = ?, 
+                        gender = ?, 
+                        bio = ?, 
+                        hobbies = ?, 
+                        personality = ?, 
+                        profile_image = ?, 
+                        preferred_gender = ?, 
+                        min_age = ?, 
+                        max_age = ? 
+                    WHERE user_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param(
-            "ississsssss",
-            $user_id,
+            "ssissssssssiii",
             $firstName,
             $lastName,
-            //$email,
-            //$hashedPassword,
             $age,
             $location,
             $birthDate,
@@ -91,11 +102,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $personalBio,
             $hobbies,
             $personality,
-            $profileImagePath
+            $profileImagePath,
+            $preferred_gender,
+            $min_age,
+            $max_age,
+            $user_id
         );
 
         if ($stmt->execute()) {
             echo json_encode(['success' => true, 'message' => 'Profile created successfully!']);
+            header("Location: ../view/matchmaking.php");
         } else {
             echo json_encode(['success' => false, 'message' => 'SQL Error: ' . $stmt->error]);
         }

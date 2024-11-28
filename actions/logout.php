@@ -9,6 +9,6 @@
     session_destroy();
 
     //Redirect the user back to the login page
-    header('Location: login.html');
+    header('Location: ../view/login.html');
     exit(); // Stop further script execution after redirect
 ?>

@@ -8,118 +8,156 @@
     <link rel="icon" type="image/x-con" href="../assets/favicon_rush.ico">
 </head>
 <body style="background-image: url('../assets/signuploginbackground.jpeg')">
-
     <header class="header">
         <h1>Discover and Experience Love</h1>
     </header>
 
     <div class="chat-container">
         <div class="users-list">
-            <?php include "../db/config.php"; include "../actions/fetch_users.php"; ?>
+            <?php 
+                include "../db/config.php"; 
+                include "../actions/fetch_users.php"; 
+            ?>
         </div>
         <div class="chat-box" id="messages">
             <!-- Chat messages will appear here -->
         </div>
         <div class="chat-input">
-            <input type="hidden" id="senderId" value="<!-- Current user's ID -->">
+            <input type="hidden" id="senderId" value="<?php echo $_SESSION['user_id']; ?>">
             <input type="hidden" id="receiverId">
             <textarea id="messageInput" placeholder="Type your message"></textarea>
-            <button id="sendButton">Send</button>
+            <button id="sendButton" disabled>Send</button>
         </div>
     </div>
 
-
-
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-        // Fetch and display chat history when a user is clicked
-        const userElements = document.querySelectorAll(".user");
-        const chatBox = document.querySelector("#messages");
-        const receiverInput = document.querySelector("#receiverId");
-        const sendButton = document.querySelector("#sendButton");
-        const messageInput = document.querySelector("#messageInput");
+        class MessagingSystem {
+            constructor() {
+                this.chatBox = document.querySelector("#messages");
+                this.messageInput = document.querySelector("#messageInput");
+                this.sendButton = document.querySelector("#sendButton");
+                this.receiverInput = document.querySelector("#receiverId");
+                this.userElements = document.querySelectorAll(".user");
+                this.lastTimestamp = null;
+                this.pollingInterval = null;
 
-        sendButton.disabled = true; // Initially disable send button
-
-        userElements.forEach(user => {
-            user.addEventListener("click", () => {
-                const userId = user.dataset.id;
-                receiverInput.value = userId;
-
-                // Highlight the selected user
-                document.querySelectorAll(".user").forEach(u => u.classList.remove("selected"));
-                user.classList.add("selected");
-
-                // Enable send button
-                sendButton.disabled = false;
-
-                // Fetch chat messages for the selected user
-                fetchMessages(userId);
-            });
-        });
-
-        // Function to fetch messages
-        function fetchMessages(receiverId) {
-            fetch(`fetch_messages.php?receiver_id=${receiverId}`)
-                .then(response => {
-                    if (!response.ok) throw new Error("Network response was not ok");
-                    return response.json(); // Parse JSON response
-                })
-                .then(data => {
-                    if (data.status === "success") {
-                        const messages = data.data;
-                        const chatBox = document.querySelector("#messages");
-                        chatBox.innerHTML = ""; // Clear chat box
-                        messages.forEach(msg => {
-                            chatBox.innerHTML += `<p><strong>${msg.sender}:</strong> ${msg.text}</p>`;
-                        });
-                    } else {
-                        console.error("Error fetching messages:", data.message);
-                    }
-                })
-                .catch(error => console.error("Error fetching messages:", error));
-        }
-
-
-        // Handle sending messages
-        sendButton.addEventListener("click", () => {
-            const receiverId = receiverInput.value.trim();
-            const message = messageInput.value.trim();
-
-            if (!receiverId || !message) {
-                alert("Please select a user and type a message before sending.");
-                return;
+                this.initializeEventListeners();
             }
 
-            // Send message to send_message.php
-            fetch("send_message.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams({ receiver_id: receiverId, message: message })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    console.log("Message sent successfully");
+            initializeEventListeners() {
+                this.userElements.forEach(user => {
+                    user.addEventListener("click", () => this.handleUserSelect(user));
+                });
 
-                    // Display the sent message in the chat box
-                    chatBox.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
-                    messageInput.value = ""; // Clear input field
-                } else {
-                    console.error("Error sending message:", data.message);
+                this.sendButton.addEventListener("click", () => this.sendMessage());
+
+                this.messageInput.addEventListener("keypress", (e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+            }
+
+            handleUserSelect(user) {
+                const userId = user.dataset.id;
+                this.receiverInput.value = userId;
+
+                this.userElements.forEach(u => u.classList.remove("selected"));
+                user.classList.add("selected");
+                this.sendButton.disabled = false;
+
+                this.chatBox.innerHTML = "";
+                this.lastTimestamp = null;
+                if (this.pollingInterval) clearInterval(this.pollingInterval);
+
+                this.fetchMessages();
+                this.startPolling();
+            }
+
+            async fetchMessages() {
+                try {
+                    const receiverId = this.receiverInput.value;
+                    if (!receiverId) return;
+
+                    const url = `fetch_messages.php?receiver_id=${receiverId}${
+                        this.lastTimestamp ? `&last_time=${this.lastTimestamp}` : ''
+                    }`;
+
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    
+                    const data = await response.json();
+                    if (data.status === "success") {
+                        this.handleNewMessages(data.data);
+                    }
+                } catch (error) {
+                    console.error("Error fetching messages:", error);
                 }
-            })
-            .catch(error => console.error("Error sending message:", error));
+            }
+
+            handleNewMessages(messages) {
+                if (!messages.length) return;
+
+                this.lastTimestamp = messages[messages.length - 1].sent_at;
+
+                messages.forEach(msg => {
+                    const messageDiv = document.createElement("div");
+                    messageDiv.className = `message ${msg.sender_id === parseInt(this.senderId.value) ? 'sent' : 'received'}`;
+                    
+                    messageDiv.innerHTML = `
+                        <div class="message-content">
+                            <span class="sender">${msg.sender_name}</span>
+                            <p>${msg.message}</p>
+                            <span class="timestamp">${msg.sent_at}</span>
+                        </div>
+                    `;
+                    this.chatBox.appendChild(messageDiv);
+                });
+
+                this.scrollToBottom();
+            }
+
+            async sendMessage() {
+                const receiverId = this.receiverInput.value;
+                const message = this.messageInput.value.trim();
+
+                if (!receiverId || !message) return;
+
+                try {
+                    const response = await fetch("send_message.php", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: new URLSearchParams({
+                            receiver_id: receiverId,
+                            message: message
+                        })
+                    });
+
+                    const data = await response.json();
+                    if (data.status === "success") {
+                        this.messageInput.value = "";
+                        await this.fetchMessages();
+                    }
+                } catch (error) {
+                    console.error("Error sending message:", error);
+                }
+            }
+
+            startPolling() {
+                this.pollingInterval = setInterval(() => this.fetchMessages(), 5000);
+            }
+
+            scrollToBottom() {
+                this.chatBox.scrollTop = this.chatBox.scrollHeight;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const messagingSystem = new MessagingSystem();
         });
-
-        // Periodically fetch new messages
-        setInterval(() => {
-            const receiverId = receiverInput.value.trim();
-            if (receiverId) fetchMessages(receiverId);
-        }, 2000);
-    });
     </script>
-
-
 </body>
 </html>

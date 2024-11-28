@@ -3,16 +3,7 @@
 session_start();
 
 // Database connection
-$host = 'localhost';
-$dbname = 'rush_db';
-$username = 'root';
-$password = '';
-$conn = new mysqli($host, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include "../db/config.php";
 
 // Validate input and ensure user session is active
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION['user_id'])) {

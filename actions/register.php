@@ -1,14 +1,15 @@
 <?php
-include "config.php";
+include "../db/config.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Sanitize and retrieve form data
-    $first_name = trim($_POST['first_name']);
-    $last_name = trim($_POST['last_name']);
+    $first_name = trim($_POST['first-name']);
+    $last_name = trim($_POST['last-name']);
     $email = trim($_POST['email']);
     $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
+    $confirm_password = $_POST['confirm-password'];
+    $role = 2;
 
     // Initialize an errors array
     $errors = [];
@@ -23,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors[] = "Invalid email format.";
     } else {
         // Check if email already exists
-        $stmt = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
+        $stmt = $conn->prepare("SELECT user_id FROM profiles WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->store_result();
@@ -61,11 +62,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // $updated_at = $created_at;
 
         // Insert new user into database using a prepared statement
-        $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $first_name, $last_name, $email, $hashed_password);
+        $stmt = $conn->prepare("INSERT INTO profiles (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssi", $first_name, $last_name, $email, $hashed_password, $role);
 
         if ($stmt->execute()) {
-            echo "Registration successful!";
+            //echo "Registration successful!";
+            header("Location: ../view/login.html");
         } else {
             echo "Error: " . $stmt->error;
         }

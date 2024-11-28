@@ -1,36 +1,59 @@
 <?php
-ini_set('display_errors', 0); // Turn off error display
-ini_set('log_errors', 1);    // Log errors instead
-error_log('Error in fetch_messages.php'); // Save error details to log file
+include '../db/config.php';
+header('Content-Type: application/json');
+session_start();
 
-header('Content-Type: application/json'); // Ensure JSON output
-
-include "../db/config.php"; // Database connection
-
-if (!isset($_GET['receiver_id'])) {
-    echo json_encode(["status" => "error", "message" => "Missing receiver_id"]);
+if (!isset($_SESSION['user_id']) || !isset($_GET['receiver_id'])) {
+    echo json_encode(['status' => 'error', 'message' => 'Missing required parameters']);
     exit;
 }
 
+$sender_id = intval($_SESSION['user_id']);
 $receiver_id = intval($_GET['receiver_id']);
-$current_user_id = 1; // Replace this with the logged-in user's ID dynamically
+$last_time = isset($_GET['last_time']) ? $_GET['last_time'] : null;
 
-$query = $db->prepare("SELECT * FROM messages WHERE 
-                        (sender_id = ? AND receiver_id = ?) OR 
-                        (sender_id = ? AND receiver_id = ?) 
-                        ORDER BY created_at ASC");
-$query->bind_param("iiii", $current_user_id, $receiver_id, $receiver_id, $current_user_id);
-$query->execute();
-$result = $query->get_result();
+try {
+    $sql = $last_time 
+        ? "SELECT m.chat_id, m.sender_id, m.receiver_id, m.message, m.sent_at, CONCAT(p.first_name, ' ', p.last_name) AS sender_name
+           FROM messages m
+           JOIN profiles p ON m.sender_id = p.user_id
+           WHERE ((m.sender_id = ? AND m.receiver_id = ?) OR (m.sender_id = ? AND m.receiver_id = ?))
+           AND m.sent_at > ?
+           ORDER BY m.sent_at ASC"
+        : "SELECT m.chat_id, m.sender_id, m.receiver_id, m.message, m.sent_at, CONCAT(p.first_name, ' ', p.last_name) AS sender_name
+           FROM messages m
+           JOIN profiles p ON m.sender_id = p.user_id
+           WHERE (m.sender_id = ? AND m.receiver_id = ?) OR (m.sender_id = ? AND m.receiver_id = ?)
+           ORDER BY m.sent_at ASC";
 
-$messages = [];
-while ($row = $result->fetch_assoc()) {
-    $messages[] = [
-        "sender" => ($row['sender_id'] == $current_user_id) ? "You" : "Them",
-        "text" => htmlspecialchars($row['message']), // Escape for safety
-    ];
+    $stmt = $conn->prepare($sql);
+    if ($last_time) {
+        $stmt->bind_param("iiiss", $sender_id, $receiver_id, $receiver_id, $sender_id, $last_time);
+    } else {
+        $stmt->bind_param("iiii", $sender_id, $receiver_id, $receiver_id, $sender_id);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $messages = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $messages[] = [
+            'chat_id' => $row['chat_id'],
+            'sender_id' => $row['sender_id'],
+            'receiver_id' => $row['receiver_id'],
+            'message' => $row['message'],
+            'sent_at' => $row['sent_at'],
+            'sender_name' => $row['sender_name']
+        ];
+    }
+
+    echo json_encode(['status' => 'success', 'data' => $messages]);
+
+} catch (Exception $e) {
+    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }
 
-echo json_encode(["status" => "success", "data" => $messages]);
-exit;
+$stmt->close();
+$conn->close();
 ?>

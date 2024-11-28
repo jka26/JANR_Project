@@ -1,36 +1,43 @@
 <?php
-include '../db/config.php'; // Include the database connection
+include "../db/config.php";
+header("Content-Type: application/json");
 
-// Get JSON input from fetch request
-$data = json_decode(file_get_contents("php://input"), true);
+if ($_SERVER["REQUEST_METHOD"] == "PUT") {
+    $data = json_decode(file_get_contents("php://input"), true);
 
-if (isset($data['id'], $data['name'], $data['age'], $data['gender'], $data['location'])) {
-    $userId = $data['id'];
-    $name = $data['name'];
-    $age = $data['age'];
-    $gender = $data['gender'];
-    $location = $data['location'];
+    if (isset($data['user_id'], $data['fname'], $data['lname'], $data['age'], $data['gender'], $data['location'])) {
+        $user_id = $data['user_id'];
+        $fname = $data['fname'];
+        $lname = $data['lname'];
+        $age = $data['age'];
+        $gender = $data['gender'];
+        $location = $data['location'];
 
-    // Prepare the SQL query to update the user
-    $stmt = $conn->prepare("UPDATE users SET first_name = ?, age = ?, gender = ?, location = ? WHERE user_id = ?");
-    
-    if ($stmt) {
-        // Bind parameters (ensuring data types match the table schema)
-        $stmt->bind_param("sisss", $name, $age, $gender, $location, $userId);
+        $sql = "UPDATE profiles SET first_name = ?, last_name = ?, age = ?, gender = ?, location = ? WHERE user_id = ?";
+        $stmt = $conn->prepare($sql);
 
-        // Execute the query and handle the result
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'User updated successfully']);
+        if ($stmt) {
+            $stmt->bind_param("ssissi", $fname, $lname, $age, $gender, $location, $user_id);
+
+            if ($stmt->execute()) {
+                echo json_encode(["message" => "User details updated successfully"]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["message" => "Error updating user: " . $stmt->error]);
+            }
+
+            $stmt->close();
         } else {
-            echo json_encode(['success' => false, 'error' => $stmt->error]);
+            http_response_code(500);
+            echo json_encode(["message" => "Failed to prepare the SQL statement."]);
         }
-
-        $stmt->close();
     } else {
-        echo json_encode(['success' => false, 'error' => 'Failed to prepare the SQL statement']);
+        http_response_code(400);
+        echo json_encode(["message" => "Invalid data provided."]);
     }
 } else {
-    echo json_encode(['success' => false, 'error' => 'Invalid input data']);
+    http_response_code(405); // Method Not Allowed
+    echo json_encode(["message" => "Invalid request method."]);
 }
 
 $conn->close();

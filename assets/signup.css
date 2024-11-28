@@ -32,13 +32,12 @@ form {
     padding: 20px 30px;
 } 
 
-
- /*body{
+ body{
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
- }*/
+ }
 
  input{
     height: 20px;

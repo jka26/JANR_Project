@@ -9,8 +9,10 @@
 </head>
 <body>
   <!-- Navigation Bar -->
+  
   <nav>
     <ul>
+      <li><a href="reviewpage.html">Send Review</a></li>
       <li><a href="messaging.php">Messages</a></li>
       <li><a href="profile.html">Profile</a></li>
       <li><a href="../actions/logout.php">Logout</a></li>
